@@ -6,7 +6,8 @@ def to_numeric(in_str):
         return float(in_str)
 
 parsed = {}
-with open('K07_F02_NUOF_IA_25_I01.dat', 'r') as f:
+
+with open('input\K07_F02_NUOF_IA_25_I01.dat', 'r') as f:
     is_parsing = False
     is_2d = False # 2D table
     is_3d = False # "3D" table, i.e. a table w/ 2 indices

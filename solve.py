@@ -3,8 +3,10 @@ import gurobipy as gp
 from gurobipy import GRB
 import numpy as np
 from amply import Amply
-
 from enum import Enum
+from parse import parsed
+
+#--------------------------------------------------------------------------------------------------------------
 # The data file contains (approximately):
 # K => Resources (a set)
 # Q => resource types (assignment done using the V parameter
@@ -28,10 +30,7 @@ num_areas = 2 #len(areas) # len(m)
 num_timeslots = 45 #len(timeslots) # len(t)
 num_resource_types = 2 #max([resource.resource_type for resource in aerial_resources])
 
-#from matrices import *
-from parse import parsed
-
-# Build matrices based on our classes (so we can easily sum in a loop)
+#Build matrices based on our classes (so we can easily sum in a loop)
 V_qk = parsed['V']#[[1 if resource.resource_type == r_type else 0 for resource in aerial_resources] for r_type in range(num_resource_types)]
 C_k = parsed['C']#[resource.water_capacity for resource in aerial_resources]
 T_k = parsed['TF']#[resource.flight_duration for resource in aerial_resources]
@@ -45,7 +44,6 @@ U_km = np.array(parsed['U']) # already indexed [k][m]
 A_tk = np.array(parsed['A']) # Already [t][k]
 W_tm = np.array(parsed['W']) # Already [t][m]
 B_qm = np.array(parsed['B'])#np.zeros((num_resource_types, num_areas), dtype=np.int32)  # Already [q][m]
-
 
 D_tkm = np.zeros((num_timeslots, num_resources, num_areas))
 for t in range(num_timeslots):
@@ -63,7 +61,7 @@ for t in range(num_timeslots):
 #Create the gurobi model
 model = gp.Model("model")
 
-# Decision variables
+#Decision variables
 c_tkm = model.addVars(num_timeslots, num_resources, num_areas, name='c', vtype=GRB.BINARY)  # Flight towards area m
 
 # Aux variables
