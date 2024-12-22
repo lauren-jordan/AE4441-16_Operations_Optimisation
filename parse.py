@@ -6,7 +6,7 @@ def to_numeric(in_str):
         return float(in_str)
 
 parsed = {}
-with open('K07_F02_NUOF_IA_25_I01.dat', 'r') as f:
+with open('input/K07_F02_NUOF_IA_25_I01.dat', 'r') as f:
     is_parsing = False
     is_2d = False # 2D table
     is_3d = False # "3D" table, i.e. a table w/ 2 indices
@@ -16,27 +16,6 @@ with open('K07_F02_NUOF_IA_25_I01.dat', 'r') as f:
     parsing_value = None
 
     for line in f.readlines():
-        # if not is_parsing:
-        #     # Should we start a new parse?
-        #     if line.startswith('set'):
-        #         # Skip sets
-        #         continue
-        #     elif line.startswith('param'):
-        #         stripped = line.removeprefix('param ')
-        #         split = line.split(':')
-        #         variable_name = split[0]
-        #
-        #         # If line contain a semicolon, it should also have a value
-        #         if ';' in split[1]:
-        #             value = split[1].strip(';= \n')
-        #             parsed[variable_name] = value
-        #             continue
-        #         else:
-        #             # Value on next line(s)
-        #             is_parsing = True
-        #             is_simple = '=' in split[1]
-        #             continue
-        # else:
         # Split the line into tokens
         tokens = list(filter(None, line.strip('\n').replace('\t', ' ').split(' ')))
 
@@ -98,25 +77,13 @@ with open('K07_F02_NUOF_IA_25_I01.dat', 'r') as f:
             else:
                 parsing_value.append(line_values)
         else:
-            print(f"Unable to process token string: {tokens}")
+            pass
+            #print(f"Unable to process token string: {tokens}")
 
         # TODO: more parsing
-        print(tokens)
+        #print(tokens)
 
-
-            # Is parsing!
-            # if not is_2d and not is_3d:
-            #     # Type not yet determined
-            #     if '*' in line:
-            #         is_3d = True
-            #     elif ':=' in line:
-            #         is_3d = True
-            #     elif is_simple:
-            #         # Ignore is_simple; is_simple can switch to is_3d
-            #         pass
-        # print()
-
-print(parsed.keys())
+#print(parsed.keys())
 print(parsed)
-print('===')
-print(parsed['E'])
+# print('===')
+# print(parsed['E'])
