@@ -84,6 +84,6 @@ with open('input/K07_F02_NUOF_IA_25_I01.dat', 'r') as f:
         #print(tokens)
 
 #print(parsed.keys())
-print(parsed)
+#print(parsed)
 # print('===')
 # print(parsed['E'])

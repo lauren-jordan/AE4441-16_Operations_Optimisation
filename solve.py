@@ -228,11 +228,12 @@ for m in range(num_areas):
         for t in range(num_timeslots):
             model.addConstr(v_tqm[t, q, m] >= int(B_qm[q, m]), name='(1.19)')
 
-#---------------------------------WATER TARGET COMPLETION-----------------------------------
+#-----
 # (1.20) - To calculate the water target completion in each time slot and area of operation
 for t in range(num_timeslots):
     for m in range(num_areas):
         lhs = TCplus_tm[t, m] - TCminus_tm[t, m]
+
         rhs = 0
         for k in range(num_resources):
             rhs += C_k[k] * E_tkm[t, k, m] * e_tkm[t, k, m]
@@ -264,28 +265,41 @@ f2 = TCplus_min - TCminus_min
 f3  = WO
 
 # Lexicographical priority: f1 > f2 > f3
-objective = [f1, f2, f3]  # List of objectives
+objective = [a1*f1, a2*f2, a3*f3]  # List of objectives
 
+# model.setObjectiveN(objective[0], 0, priority=3)  # f1 has the highest priority
+# model.setObjectiveN(objective[1], 1, priority=2)  # f2 has the second highest priority
+# model.setObjectiveN(objective[2], 2, priority=1)  # f3 has the lowest priority
 
-model.setObjectiveN(-a1*objective[0], 0, priority=3)  # f1 has the highest priority
-model.setObjectiveN(a2*objective[1], 1, priority=2)  # f2 has the second highest priority
-model.setObjectiveN(a3*objective[2], 2, priority=1)  # f3 has the lowest priority
-
-#model.setObjective(sum(weighted_objective), GRB.MAXIMIZE)
+model.setObjective(sum(objective), GRB.MAXIMIZE)
 
 model.write('test.lp')
 model.setParam(GRB.Param.Seed, 42)  # Set random seed for reproducibility
-model.setParam(GRB.Param.TimeLimit, 60)  # Set time limit to 3600 seconds (1 hour)
+model.setParam(GRB.Param.TimeLimit, 180)  # Set time limit to 3600 seconds (1 hour)
 model.optimize()
 
+print("---------------------------------------------------")
 if model.Status == GRB.OPTIMAL:
     print("Optimal solution found within time limit.")
+    print( )
+    # Compute the total target deficit (TD)
+    TD = -sum(I_m[m] * TCminus_tm[t, m].x for t in range(num_timeslots) for m in range(num_areas))
+    print(f"Total Target Deficit (TD): {TD/1000:.2f}")
+    
+    # Extract the minimum target completion (TCmin)
+    TCmin = TCplus_min.x - TCminus_min.x
+    print(f"Minimum Target Completion (TCmin): {TCmin/1000:.2f}")
+    
+    # Extract the total water output (WO)
+    WO_value = WO.x
+    print(f"Total Water Output (WO): {WO_value/1000:.2f}")
 elif model.Status == GRB.TIME_LIMIT:
     print("Time limit reached. Best solution found:")
     print(f"Objective value: {model.ObjVal}")
 else:
     print(f"Optimization stopped with status {model.Status}.")
 
+print( )
 print(f"Number of constraints: {model.numConstrs}")
 print(f"Number of variables: {model.numVars}")
 
